@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, AbstractControlOptions, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-cadastro',
@@ -13,11 +13,12 @@ export class CadastroComponent {
 
   constructor(private fb: FormBuilder) {
     this.form = this.fb.group({
-      username: [''],
+      username: ['',Validators.required],
       passwords: this.fb.group({
-        password: [''],
-        confirmPassword: ['']
-      })
+        password: ['',Validators.required],
+        confirmPassword: ['',Validators.required]
+      },
+    {validators: this.mesmasenhaValidator})
     });
   }
 
@@ -27,5 +28,16 @@ export class CadastroComponent {
     } else {
       alert('Formulário inválido');
     }
+  }
+
+  mesmasenhaValidator:ValidatorFn = (formGroup:AbstractControl):ValidationErrors | null =>{
+    let senha = formGroup.get('password')?.value;
+    let confirmarSenha = formGroup.get('confirmPassword')?.value;
+
+    if(senha !== confirmarSenha){
+      return {senhasDiferentes:true}
+    }
+    
+    return null
   }
 }
